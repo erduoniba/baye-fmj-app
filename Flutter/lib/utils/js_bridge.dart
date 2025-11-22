@@ -520,176 +520,39 @@ class JSBridge {
   // Settings update functions
 
   static Future<void> updateColorFilter(String filter) async {
-    // 使用与iOS一致的FilterBridge API调用方式
-    final script = """
-      (function() {
-        if (typeof window.FilterBridge !== 'undefined' && window.FilterBridge.setPresetFilter) {
-          // 使用统一的 FilterBridge API
-          return window.FilterBridge.setPresetFilter('$filter');
-        } else if (typeof window.setPresetFilter === 'function') {
-          // 降级到直接调用（兼容旧版本）
-          return window.setPresetFilter('$filter');
-        } else {
-          console.warn('滤镜API未找到，可能页面还未完全加载');
-          return false;
-        }
-      })();
-    """;
-    try {
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d("Updated color filter: $filter");
-    } catch (error) {
-      LogUtils.d("Failed to update color filter: $error");
-    }
+    
   }
 
   static Future<void> updateGameSpeed(double speed) async {
-    // 使用与iOS一致的setGameSpeed API调用方式，同时兼容旧版本的gameSpeedMultiple变量
-    final script = """
-      if (typeof window.setGameSpeed === 'function') {
-        window.setGameSpeed($speed);
-        console.log('通过setGameSpeed API设置游戏速度: $speed');
-      } else {
-        // 降级到直接设置变量（兼容旧版本）
-        window.gameSpeedMultiple = $speed;
-        console.log('通过变量设置游戏速度: $speed');
-      }
-    """;
-    try {
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d("Updated game speed: $speed");
-    } catch (error) {
-      LogUtils.d("Failed to update game speed: $error");
-    }
+    
   }
 
   static Future<void> updatePortraitMode(bool isPortrait) async {
-    final script =
-        "window.setPortraitMode && window.setPortraitMode($isPortrait);";
-    try {
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d("Updated portrait mode: $isPortrait");
-    } catch (error) {
-      LogUtils.d("Failed to update portrait mode: $error");
-    }
+    
   }
 
   static Future<void> updateMapDisplay(bool showMap) async {
-    final script = """
-      window.showMapContainer && window.showMapContainer($showMap);
-      localStorage.setItem('showMapContainer', '$showMap');
-    """;
-    try {
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d("Updated map display: $showMap");
-    } catch (error) {
-      LogUtils.d("Failed to update map display: $error");
-    }
+
   }
 
   static Future<void> updateCombatProbability(int probability) async {
-    // 根据iOS版本的逻辑，实际传递给游戏的是 100 - 用户设置值
-    final actualProbability = 100 - probability;
-    final script = """
-      window.combat_probability = $actualProbability;
-      localStorage.setItem('combat_probability', '$actualProbability');
-    """;
-    try {
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d(
-        "Updated combat probability: $probability% (actual: $actualProbability)",
-      );
-    } catch (error) {
-      LogUtils.d("Failed to update combat probability: $error");
-    }
+
   }
 
   static Future<void> setExpMultiple(double multiple) async {
-    final script =
-        "if (typeof window.winExpMultiple !== 'undefined') { window.winExpMultiple = $multiple; }";
-    try {
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d("Set exp multiple: $multiple");
-    } catch (error) {
-      LogUtils.d("Failed to set exp multiple: $error");
-    }
+   
   }
 
   static Future<void> setGoldMultiple(double multiple) async {
-    final script =
-        "if (typeof window.winMoneyMultiple !== 'undefined') { window.winMoneyMultiple = $multiple; }";
-    try {
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d("Set gold multiple: $multiple");
-    } catch (error) {
-      LogUtils.d("Failed to set gold multiple: $error");
-    }
+    
   }
 
   static Future<void> setItemMultiple(double multiple) async {
-    final script =
-        "if (typeof window.winItemMultiple !== 'undefined') { window.winItemMultiple = $multiple; }";
-    try {
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d("Set item multiple: $multiple");
-    } catch (error) {
-      LogUtils.d("Failed to set item multiple: $error");
-    }
+    
   }
 
-  /// 添加全部物品到游戏（VIP特权）
-  /// 调用游戏引擎的 iOSGrantIAPItems 接口
   static Future<Map<String, dynamic>> addAllItems(String productId) async {
-    try {
-      // 确保JS函数已加载
-      final checkScript = """
-        (function() {
-          if (typeof window.iOSGrantIAPItems === 'function') {
-            return true;
-          } else {
-            console.error('iOSGrantIAPItems function not found');
-            return false;
-          }
-        })();
-      """;
-
-      final isReady = await _webViewController?.evaluateJavascript(
-        source: checkScript,
-      );
-
-      if (isReady != true) {
-        LogUtils.d("iOSGrantIAPItems function not ready yet");
-        return {'success': false, 'message': '游戏引擎尚未准备好，请稍后再试'};
-      }
-
-      // 调用游戏的物品发放接口
-      final script = "window.iOSGrantIAPItems('$productId');";
-      final result = await _webViewController?.evaluateJavascript(
-        source: script,
-      );
-
-      LogUtils.d("Add all items result: $result");
-
-      // 解析返回的 JSON 字符串
-      if (result != null && result is String) {
-        try {
-          final data = jsonDecode(result) as Map<String, dynamic>;
-          return {
-            'success': data['success'] ?? false,
-            'message': data['message'] ?? '物品添加完成',
-            'action': data['action'] ?? 'completed',
-          };
-        } catch (e) {
-          LogUtils.d("Failed to parse add items result: $e");
-        }
-      }
-
-      // 默认返回成功
-      return {'success': true, 'message': '全部物品添加成功'};
-    } catch (error) {
-      LogUtils.d("Failed to add all items: $error");
-      return {'success': false, 'message': '添加物品失败: $error'};
-    }
+    return {'success': true, 'message': '成功'};
   }
 
   /// 调试：显示当前伏魔记存档状态
@@ -769,31 +632,8 @@ class JSBridge {
     LogUtils.d("=== 存档状态调试结束 ===");
   }
 
-  /// 重置所有激励效果（经验倍数、金币倍数、大地图）
   static Future<void> resetRewardEffects() async {
-    try {
-      final script = """
-        // 重置经验倍数为1倍
-        if (typeof window.winExpMultiple !== 'undefined') {
-          window.winExpMultiple = 1.0;
-        }
-        // 重置金币倍数为1倍
-        if (typeof window.winMoneyMultiple !== 'undefined') {
-          window.winMoneyMultiple = 1.0;
-        }
-        // 重置大地图显示
-        if (typeof window.showMapContainer === 'function') {
-          window.showMapContainer(false);
-        }
-        localStorage.setItem('showMapContainer', 'false');
-        console.log('已重置所有激励效果');
-      """;
-
-      await _webViewController?.evaluateJavascript(source: script);
-      LogUtils.d("Reset all reward effects successfully");
-    } catch (error) {
-      LogUtils.d("Failed to reset reward effects: $error");
-    }
+    
   }
 
   // Inject performance timing script

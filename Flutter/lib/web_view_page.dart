@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'pages/enhanced_about_page.dart';
 import 'offline_package_manager.dart';
 import 'utils/log_utils.dart';
 import 'utils/app_config.dart';
 import 'utils/js_bridge.dart';
 import 'utils/platform_utils.dart';
-import 'utils/multiplier_settings.dart';
-import 'services/iap_manager.dart';
 
 
 class WebViewPage extends StatefulWidget {
@@ -134,24 +131,10 @@ class _WebViewPageState extends State<WebViewPage> {
     super.initState();
     _initializeModName();
     _initializeGame();
-
-    // 监听IAP状态变化，以便在购买VIP后刷新UI
-    IAPManager().addListener(_onIAPStatusChanged);
-  }
-
-  void _onIAPStatusChanged() {
-    // 当IAP状态改变时，刷新UI并重新应用VIP功能
-    LogUtils.d('IAP状态改变，重新应用VIP功能...');
-    if (mounted) {
-      setState(() {});
-      // 重新应用VIP功能（5倍经验、5倍金币、地图）
-      _applyVipFeaturesIfPurchased();
-    }
   }
 
   @override
   void dispose() {
-    IAPManager().removeListener(_onIAPStatusChanged);
     super.dispose();
   }
 
@@ -171,74 +154,11 @@ class _WebViewPageState extends State<WebViewPage> {
 
   bool _canGoBack = false;
 
-  /// 如果用户购买了VIP，自动激活VIP功能
-  void _applyVipFeaturesIfPurchased() async {
-    final iapManager = IAPManager();
-    final settings = MultiplierSettings();
-
-    if (iapManager.isVip) {
-      LogUtils.d('VIP purchased, applying VIP features with multipliers...');
-
-      // 获取用户设置的倍率值
-      final expMultiplier = await settings.expMultiplier;
-      final goldMultiplier = await settings.goldMultiplier;
-      final itemMultiplier = await settings.itemMultiplier;
-
-      // 应用经验倍率
-      JSBridge.setExpMultiple(expMultiplier.toDouble());
-      LogUtils.d('${expMultiplier}x EXP enabled');
-
-      // 应用金币倍率
-      JSBridge.setGoldMultiple(goldMultiplier.toDouble());
-      LogUtils.d('${goldMultiplier}x Gold enabled');
-
-      // 应用物品倍率
-      JSBridge.setItemMultiple(itemMultiplier.toDouble());
-      LogUtils.d('${itemMultiplier}x Item enabled');
-
-      // 启用地图显示（不受开关控制）
-      AppConfig.shared.showMapContainer = true;
-      JSBridge.updateMapDisplay(true);
-
-      LogUtils.d('VIP features activated with multipliers');
-
-      // 显示VIP已激活的提示
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'VIP功能已激活：'
-              '${expMultiplier}x经验、'
-              '${goldMultiplier}x金币、'
-              '${itemMultiplier}x物品、'
-              '小地图'
-            ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-    } else if (iapManager.hasDoubleExp) {
-      LogUtils.d('Double Exp purchased, applying experience boost...');
-      final expMultiplier = await settings.expMultiplier;
-      JSBridge.setExpMultiple(expMultiplier.toDouble());
-    } else if (iapManager.hasDoubleGold) {
-      LogUtils.d('Double Gold purchased, applying gold boost and map...');
-      final goldMultiplier = await settings.goldMultiplier;
-      JSBridge.setGoldMultiple(goldMultiplier.toDouble());
-      AppConfig.shared.showMapContainer = true;
-      JSBridge.updateMapDisplay(true);
-    }
-  }
-
   void _applyCurrentSettings() {
     final config = AppConfig.shared;
 
     // 首先重置所有激励效果（每次页面加载都重置）
     JSBridge.resetRewardEffects();
-
-    // 如果用户购买了VIP，自动启用VIP功能
-    _applyVipFeaturesIfPurchased();
 
     // 只对伏魔记应用相关设置，避免干扰其他游戏
     if (config.appName == AppName.hdFmjApp) {
@@ -654,30 +574,7 @@ class _WebViewPageState extends State<WebViewPage> {
                 },
               ) : null),
         actions: [
-          // Map toggle button for FMJ app - only show if user has VIP
-          if (_currentGame == AppName.hdFmjApp && IAPManager().isVip)
-            IconButton(
-              iconSize: isLandscape ? 20.0 : 24.0,
-              icon: Icon(
-                AppConfig.shared.showMapContainer ? Icons.map : Icons.map_outlined,
-                color: AppConfig.shared.showMapContainer ? Colors.white : Colors.grey.withValues(alpha: 0.7),
-              ),
-              onPressed: _toggleMapContainer,
-              tooltip: '小地图开关',
-            ),
-          IconButton(
-            iconSize: isLandscape ? 20.0 : 24.0,
-            icon: Icon(
-              Icons.info_outline,
-              color: AppConfig.shared.appBarForegroundColor,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const EnhancedAboutPage()),
-              );
-            },
-          ),
+          
         ],
       ),
       body: SafeArea(

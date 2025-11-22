@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'web_view_page.dart';
 import 'utils/app_config.dart';
-import 'services/iap_manager.dart';
 import 'services/orientation_service.dart';
 
 void main() async {
@@ -21,7 +20,6 @@ Future<void> _initializeServicesInBackground() async {
   try {
     // 并行初始化IAP和屏幕方向
     await Future.wait([
-      IAPManager().initialize(),
       OrientationService.instance.initialize(
         portraitMode: AppConfig.shared.portraitMode,
       ),

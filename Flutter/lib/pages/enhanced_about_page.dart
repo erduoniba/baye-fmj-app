@@ -7,10 +7,8 @@ import '../components/common_card.dart';
 import '../components/settings_cells.dart';
 import '../utils/app_config.dart';
 import '../utils/js_bridge.dart';
-import '../services/iap_manager.dart';
 import 'save_list_page.dart';
 import 'feedback_page.dart';
-import 'purchase_page.dart';
 
 class EnhancedAboutPage extends StatefulWidget {
   const EnhancedAboutPage({super.key});
@@ -411,51 +409,11 @@ class _EnhancedAboutPageState extends State<EnhancedAboutPage> {
             ],
           ),
 
-          // 高级功能购买 (仅FMJ应用显示)
           if (AppConfig.shared.appName == AppName.hdFmjApp)
             CommonCard(
               title: '高级功能',
               children: [
-                ListTile(
-                  dense: true,
-                  leading: const Icon(Icons.diamond, color: Colors.purple),
-                  title: const Text('解锁高级功能', style: TextStyle(fontSize: 14)),
-                  subtitle: Text(
-                    IAPManager().isVip
-                      ? '已购买VIP会员'
-                      : '购买VIP获取5倍经验、5倍金币等功能',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (IAPManager().isVip)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text(
-                            'VIP',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_ios, size: 16),
-                    ],
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const PurchasePage()),
-                    );
-                  },
-                ),
+               
               ],
             ),
 
