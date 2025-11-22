@@ -9,21 +9,6 @@ import Foundation
 
 // MARK: - App Constants
 struct HDConstants {
-    
-    // MARK: - JavaScript Functions
-    struct JavaScript {
-        static let joystickModeChanged = "window.joystickModeChanged"
-        static let setPresetFilter = "window.setPresetFilter"
-        static let gameSpeedMultiple = "window.gameSpeedMultiple"
-        static let showMapContainer = "window.showMapContainer"
-        static let winExpMultiple = "window.winExpMultiple"
-        static let winMoneyMultiple = "window.winMoneyMultiple"
-        static let disableTouchCallout = """
-            document.documentElement.style.webkitTouchCallout='none';
-            document.body.style.webkitTouchCallout='none';
-            """
-    }
-    
     // MARK: - URLs
     struct URLs {
         static let privacyPolicy = "https://blog.csdn.net/u012390519/article/details/145736113"
