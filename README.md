@@ -32,7 +32,7 @@
 
 #### 1、全网最初安卓版源码（cdd990）
 
-​	十年前，cdd990开源了全网最初的安卓版《伏魔记》源码，这是将经典BBK游戏移植到现代移动平台的开创性尝试。
+​	十年前，cdd990大佬开源了全网最初的安卓版《伏魔记》源码，这是将经典BBK游戏移植到现代移动平台的开创性尝试。
 
 🎯 技术特点
 
@@ -53,7 +53,7 @@
 #### 2、伏魔记 Java 版本（yuanmomo）
 
 
-​	九年前，yuanmomo在cdd990版本的基础上，成功将游戏移植到PC平台。这个版本修改了绘图系统和事件监听机制，使游戏能够在桌面环境下流畅运行。https://github.com/yuanmomo/fmj_pc
+​	九年前，yuanmomo大佬在cdd990大佬版本的基础上，成功将游戏移植到PC平台。这个版本修改了绘图系统和事件监听机制，使游戏能够在桌面环境下流畅运行。https://github.com/yuanmomo/fmj_pc
 
 🔧 核心改进
 	**• 绘图系统重构：适配PC端的图形渲染**
@@ -72,7 +72,7 @@
 
 #### 3、伏魔记 Kotlin 版本（bgwp）
 
-​	七年前，bgwp使用Kotlin语言重写了整个游戏，并将其编译为JavaScript在Web环境中运行，这是一次技术栈的重大创新。https://gitee.com/bgwp/fmj.kt
+​	七年前，bgwp/dalong大佬使用Kotlin语言重写了整个游戏，并将其编译为JavaScript在Web环境中运行，这是一次技术栈的重大创新。https://gitee.com/bgwp/fmj.kt
 
 ⚡ 技术亮点
 
@@ -94,7 +94,7 @@
 
 #### 4、BBKRPGSimulator：C#版本	
 
-​	五年前，stratosblue带着满满的情怀，将游戏移植到C#平台。作者的话很有代表性："这个代码移植快完成的时候才发现原Java项目还有指令和逻辑没有完成。" https://github.com/stratosblue/BBKRPGSimulator
+​	五年前，stratosblue大佬带着满满的情怀，将游戏移植到C#平台。作者的话很有代表性："这个代码移植快完成的时候才发现原Java项目还有指令和逻辑没有完成。" https://github.com/stratosblue/BBKRPGSimulator
 
 🎯 技术特色
 
@@ -114,7 +114,7 @@
 
 #### 5、Android 版本伏魔记（artharyoung）
 
-​	四年前，artharyoung基于yuanmomo的PC版本，再次将游戏带回到Android平台，这是继cdd990之后的又一次安卓移植尝试。 https://github.com/artharyoung/android_fmj
+​	四年前，artharyoung大佬基于yuanmomo大佬的PC版本，再次将游戏带回到Android平台，这是继cdd990之后的又一次安卓移植尝试。 https://github.com/artharyoung/android_fmj
 
 🔄 技术路径
 
@@ -134,7 +134,7 @@
 
 #### 6、java桌面版伏魔记（jacky14）
 
-​	三年前，jacky14延续了yuanmomo的技术路线，开发了专门的Java桌面版本，从源码目录结构可以看出是参考经典PC版本架构。 https://github.com/jacky14/fmj_pc
+​	三年前，jacky14大佬延续了yuanmomo大佬的技术路线，开发了专门的Java桌面版本，从源码目录结构可以看出是参考经典PC版本架构。 https://github.com/jacky14/fmj_pc
 
 🏗️ 架构特点
 
@@ -154,7 +154,7 @@
 
 #### 7、GameShell适配的步步高经典游戏
 
-​	三年前，zzxzzk115将游戏适配到GameShell掌机设备上，基于bgwp的Kotlin版本构建H5页面游戏，实现了专业掌机的游戏体验。 https://github.com/zzxzzk115/BBKGames_GameShell
+​	三年前，zzxzzk115大佬将游戏适配到GameShell掌机设备上，基于bgwp的Kotlin版本构建H5页面游戏，实现了专业掌机的游戏体验。 https://github.com/zzxzzk115/BBKGames_GameShell
 
 🔧 适配特色
 
