@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>三国霸业</title>
+        <link rel="stylesheet" type="text/css" href="css/baye.css" />
+        <style>
+            /* 滤镜层样式 */
+            .filter-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+                z-index: 1000;
+                mix-blend-mode: multiply;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            #app {
+                position: relative;
+                display: inline-block;
+            }
+
+            /* 竖屏模式下的布局 - 贴顶部显示 */
+            @media screen and (orientation: portrait) {
+                #app {
+                    width: 100vw !important;
+                    height: calc(100vw * 0.6) !important;  /* 高度 = 宽度 * (96/160) */
+                    margin-top: 0 !important;
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                    padding: 0 !important;
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    transform: none !important;
+                    display: block !important;
+                    overflow: hidden !important;
+                }
+
+                #lcd {
+                    width: 100% !important;
+                    height: 100% !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                }
+            }
+             /* 横屏模式下的布局 - 自己加的 */
+             @media screen and (orientation: landscape) {
+                #app {
+                    width: 70% !important;
+                   /* height: calc(80vw * 0.6) !important; */ /* 高度 = 宽度 * (96/160) */
+                    margin-top: 0 !important;
+                    margin-left: 15% !important;
+                    margin-right: 0 !important;
+                    padding: 0 !important;
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    transform: none !important;
+                    display: block !important;
+                    overflow: hidden !important;
+                }
+
+                #lcd {
+                    width: 100% !important;
+                    height: 100% !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                }
+            }
+            
+        
+    /* 基础控制按钮样式 - 共用 */
+.direction-btn, .action-btn,
+.repeat-btn-container #btn_repeat,
+.help-btn-container #btn_help {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: all 0.1s ease !important;
+}
+
+.direction-btn:active, .action-btn:active,
+.repeat-btn-container #btn_repeat:active,
+.help-btn-container #btn_help:active {
+  transform: scale(0.9) !important;
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 图片尺寸控制 */
+.direction-btn img, 
+.action-btn img,
+.repeat-btn-container #btn_repeat img,
+.help-btn-container #btn_help img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* 竖屏模式布局 */
+@media screen and (orientation: portrait) {
+  /* 方向键 - 左下角 */
+  .direction-pad {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    left: 15px;
+    bottom: 40px;
+    z-index: 9999;
+    display: block !important;
+  }
+
+  /* 操作键 - 右下角 */
+  .action-pad {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    right: 15px;
+    bottom: 40px;
+    z-index: 9999;
+    display: block !important;
+  }
+
+  /* R键 - 放在方向键和操作键之间，上方 */
+  .repeat-btn-container {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    left: 50%;
+    bottom: 140px;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: block !important;
+  }
+
+  /* H键 - 放在方向键和操作键之间，下方 */
+  .help-btn-container {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    left: 50%;
+    bottom: 70px;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: block !important;
+  }
+
+  /* 竖屏方向按钮布局 */
+  .direction-btn {
+    width: 50px;
+    height: 50px;
+  }
+
+  #dir_up {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #dir_down {
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #dir_left {
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+  }
+
+  #dir_right {
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+  }
+
+  /* 竖屏操作按钮布局 */
+  .action-btn {
+    width: 50px;
+    height: 50px;
+  }
+
+  #btn_enter {
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  #btn_exit {
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #btn_up {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #btn_down {
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* 竖屏功能按钮样式 */
+  .repeat-btn-container #btn_repeat,
+  .help-btn-container #btn_help {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* 横屏模式布局 */
+@media screen and (orientation: landscape) {
+  /* 横屏方向键 - 左下角，更大 */
+  .direction-pad {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    left: 20px;
+    bottom: 20px;
+    z-index: 9999;
+    display: block !important;
+  }
+
+  /* 横屏操作键 - 右下角，更大 */
+  .action-pad {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+    display: block !important;
+  }
+
+  /* 横屏R键 - 右上角 */
+  .repeat-btn-container {
+    position: fixed !important;
+    width: 50px !important;
+    height: 50px !important;
+    right: 20px !important;
+    top: 20px !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: 9999 !important;
+    display: block !important;
+  }
+
+  /* 横屏H键 - 左上角 */
+  .help-btn-container {
+    position: fixed !important;
+    width: 50px !important;
+    height: 50px !important;
+    left: 20px !important;
+    top: 20px !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: 9999 !important;
+    display: block !important;
+  }
+
+
+  /* 横屏方向按钮布局 - 更大 */
+  .direction-btn {
+    width: 50px;
+    height: 50px;
+  }
+
+  #dir_up {
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #dir_down {
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #dir_left {
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+  }
+
+  #dir_right {
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+  }
+
+  /* 横屏操作按钮布局 - 更大 */
+  .action-btn {
+    width: 50px;
+    height: 50px;
+  }
+
+  #btn_enter {
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  #btn_exit {
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #btn_up {
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #btn_down {
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* 横屏功能按钮样式 - 更大 */
+  .repeat-btn-container #btn_repeat,
+  .help-btn-container #btn_help {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* 修复方向键激活状态的位置偏移 */
+.direction-btn, .action-btn,
+.repeat-btn-container #btn_repeat,
+.help-btn-container #btn_help {
+  transition: all 0.1s ease !important;
+}
+
+/* 修复方向键激活状态 - 合并transform */
+#dir_up:active {
+  transform: translateX(-50%) scale(0.9) !important;
+}
+
+#dir_down:active {
+  transform: translateX(-50%) scale(0.9) !important;
+}
+
+#dir_left:active {
+  transform: translateY(-50%) scale(0.9) !important;
+}
+
+#dir_right:active {
+  transform: translateY(-50%) scale(0.9) !important;
+}
+
+/* 修复操作键激活状态 - 合并transform */
+#btn_enter:active {
+  transform: translateY(-50%) scale(0.9) !important;
+}
+
+#btn_exit:active {
+  transform: translateX(-50%) scale(0.9) !important;
+}
+
+#btn_up:active {
+  transform: translateX(-50%) scale(0.9) !important;
+}
+
+#btn_down:active {
+  transform: translateY(-50%) scale(0.9) !important;
+}
+
+/* 功能按钮激活状态 */
+.repeat-btn-container #btn_repeat:active,
+.help-btn-container #btn_help:active {
+  transform: scale(0.9) !important;
+}
+
+/* 禁用用户选择 */
+.direction-btn, .action-btn,
+.repeat-btn-container #btn_repeat,
+.help-btn-container #btn_help {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}   
+
+/* 切换按钮样式 - 左下角 */
+.toggle-btn-container {
+  position: fixed;
+  z-index: 10001;
+  display: block !important;
+}
+
+.toggle-btn {
+  width: 15px;
+  height: 15px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 0px solid rgba(255, 255, 255, 0.0);
+  border-radius: 0%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.toggle-btn:active {
+  transform: scale(0.9);
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* 竖屏模式下切换按钮位置 - 左下角 */
+@media screen and (orientation: portrait) {
+  .toggle-btn-container {
+    left: 5px;
+    bottom: 5px;
+  }
+}
+
+/* 横屏模式下切换按钮位置 - 左下角 */
+@media screen and (orientation: landscape) {
+  .toggle-btn-container {
+    left: 5px;
+    bottom: 5px;
+  }
+}
+
+/* 隐藏状态下的虚拟按键 */
+.virtual-buttons-hidden .direction-pad,
+.virtual-buttons-hidden .action-pad,
+.virtual-buttons-hidden .repeat-btn-container,
+.virtual-buttons-hidden .help-btn-container {
+  display: none !important;
+}
+
+/* 切换按钮在隐藏状态下的样式 */
+.virtual1-buttons-hidden .toggle-btn {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+/* 确保切换按钮不被隐藏 */
+.virtual1-buttons-hidden .toggle-btn-container {
+  display: block !important;
+}             
+                    
+        </style>
+        <link rel="icon" href="favicon.png">
+        <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-touch-fullscreen" content="yes"/>
+        <meta name="apple-mobile-web-app-title" content="三国霸业">
+        <meta name="full-screen" content="yes"><!-- UC强制全屏 -->
+        <meta name="x5-fullscreen" content="true"><!-- QQ强制全屏 -->
+        <meta name="browsermode" content="application"><!-- UC应用模式 -->
+        <meta name="x5-page-mode" content="app"><!-- QQ应用模式 -->
+        <meta name="msapplication-tap-highlight" content="no"><!-- windows phone 点击无高光 -->
+        <link rel="apple-touch-icon-precomposed" sizes="57x57" href="favicon.png"><!-- iPhone 和 iTouch，默认 57x57 像素，必须有 -->
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="favicon.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="favicon.png"><!-- Retina iPhone 和 Retina iTouch，114x114 像素，可以没有，但推荐有 -->
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="favicon.png"><!-- Retina iPad，144x144 像素，可以没有，但推荐有 --><!-- iOS 图标 end -->
+        <style>
+            body {
+                overflow: hidden;
+                margin:0px;
+            }
+            #info {
+                float:left;
+                position: fixed;
+                left: 0;
+                top: 0;
+                background: white;
+                opacity: 0.8;
+                pointer-events:none;
+            }
+        </style>
+        
+        <!-- 重定向守卫 -->
+        <script src="js/redirect-guard.js"></script>
+
+        <!-- 依赖库 -->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/encoding-indexes.js"></script>
+        <script src="js/encoding.js"></script>
+        <script src="js/sprintf.js"></script>
+        <script src="js/lzma_worker-min.js"></script>
+        <script src="js/base64.js"></script>
+        <script src="js/performance-monitor.js"></script>
+
+        <!-- WASM 加载器 -->
+        <script src="js/wasm-loader.js"></script>
+    </head>
+    <body>
+        <div id="app" style="position: relative; display: inline-block;">
+            <canvas id="lcd" width="160" height="96">然而你的浏览器并不支持HTML5</canvas>
+            <!-- 滤镜层 -->
+            <div id="filterOverlay" class="filter-overlay"></div>
+        </div>
+        <div id="info"></div>
+        
+                <div id="zone"></div>
+
+    <!-- 方向按钮 -->
+    <div class="direction-pad" id="direction_pad">
+      <div class="direction-btn" id="dir_up">
+        <img src="images/up.png" alt="上" />
+      </div>
+      <div class="direction-btn" id="dir_down">
+        <img src="images/down.png" alt="下" />
+      </div>
+      <div class="direction-btn" id="dir_left">
+        <img src="images/left.png" alt="左" />
+      </div>
+      <div class="direction-btn" id="dir_right">
+        <img src="images/right.png" alt="右" />
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-pad" id="action_pad">
+      <div class="action-btn" id="btn_enter">
+        <img src="images/enter.png" alt="确认" />
+      </div>
+      <div class="action-btn" id="btn_exit">
+        <img src="images/exit.png" alt="取消" />
+      </div>
+      <div class="action-btn" id="btn_up">
+        <img src="images/up.png" alt="上一个" />
+      </div>
+      <div class="action-btn" id="btn_down">
+        <img src="images/down.png" alt="下一个" />
+      </div>
+    </div>
+
+    <!-- R键按钮 - 独立放置在方向键和操作键之间 -->
+    <div class="repeat-btn-container" id="repeat_btn_container">
+      <div class="action-btn" id="btn_repeat">
+        <span style="color: gray; font-size: 20px; font-weight: bold;">图</span>
+      </div>
+    </div>
+    
+    <!-- H键按钮 - 内置功能按钮 -->
+    <div class="help-btn-container" id="help_btn_container">
+      <div class="action-btn" id="btn_help">
+        <span style="color: gray; font-size: 20px; font-weight: bold;">信</span>
+      </div>
+    </div>
+    
+    <!-- 切换按钮HTML -->
+<div class="toggle-btn-container" id="toggle_btn_container">
+  <div id="btn_toggle" class="toggle-btn">
+     <span style="color: gray; font-size: 5px; font-weight: bold;"></span>
+  </div>
+</div> 
+        
+    </body>
+</html>
+<!-- 核心游戏脚本 -->
+<script src="js/idbkvstore.min.js?ver=202111140022"></script>
+<script src="js/bridge.js?ver=202111140022"></script>
+<script src="js/lcd.js?ver=202111140022"></script>
+<script src="js/filter-bridge.js?ver=202111140022"></script>
+        <!-- 先加载游戏的键盘系统 
+<script src="js/keyboard.js"></script>
+<!-- 然后加载虚拟手柄 
+<script src="js/virtual-gamepad.js"></script>
+我先把他注释掉，因为它们都是harry和我后加的，没实现
+-->
+
+<!-- 然后在内联脚本中编写虚拟按键功能 -->
+<script>
+// 虚拟按键功能 - 平衡版本：保留触摸反馈但防止过于灵敏
+document.addEventListener('DOMContentLoaded', function() {
+    // 虚拟键值映射
+    const keyMap = {
+        'dir_up': 0x22,      // VK_UP
+        'dir_down': 0x23,    // VK_DOWN
+        'dir_left': 0x24,    // VK_LEFT
+        'dir_right': 0x25,   // VK_RIGHT
+        'btn_enter': 0x27,   // VK_ENTER
+        'btn_exit': 0x28,    // VK_EXIT
+        'btn_up': 0x20,      // VK_PGUP
+        'btn_down': 0x21,    // VK_PGDN
+        'btn_repeat': 0x33,  // VK_SEARCH
+        'btn_help': 0x26     // VK_HELP
+    };
+    
+    // 方向键连按控制
+    const directionKeys = ['dir_up', 'btn_enter', 'dir_down', 'dir_left', 'dir_right'];
+    const directionTimers = {};
+    
+    // 方向键连按参数
+    const REPEAT_DELAY = 200;   // 首次按下后延迟200毫秒开始连按
+    const REPEAT_INTERVAL = 100; // 连按间隔100毫秒
+    
+    // 精细的防重复触发机制
+    const lastTriggerTime = {};
+    const MIN_TRIGGER_INTERVAL = 180; // 最小触发间隔180毫秒
+    
+    // 发送按键函数（带精细防重复）
+    function sendKeyWithCooldown(buttonId, keyValue) {
+        const now = Date.now();
+        const lastTime = lastTriggerTime[buttonId] || 0;
+        
+        // 检查触发间隔
+        if (now - lastTime < MIN_TRIGGER_INTERVAL) {
+            console.log('触发间隔太短，跳过:', buttonId);
+            return;
+        }
+        
+        // 更新最后触发时间
+        lastTriggerTime[buttonId] = now;
+        
+        // 发送按键
+        if (typeof _bayeSendKey === 'function') {
+            _bayeSendKey(keyValue);
+            console.log('虚拟按键:', buttonId, '0x' + keyValue.toString(16));
+        }
+    }
+    
+    // 方向键开始连按
+    function startDirectionRepeat(buttonId, keyValue) {
+        // 先立即触发一次
+        sendKeyWithCooldown(buttonId, keyValue);
+        
+        // 清除可能存在的定时器
+        if (directionTimers[buttonId]) {
+            clearTimeout(directionTimers[buttonId]);
+        }
+        
+        // 设置延迟后开始连按
+        directionTimers[buttonId] = setTimeout(() => {
+            // 开始连按
+            directionTimers[buttonId] = setInterval(() => {
+                sendKeyWithCooldown(buttonId, keyValue);
+            }, REPEAT_INTERVAL);
+        }, REPEAT_DELAY);
+    }
+    
+    // 停止方向键连按
+    function stopDirectionRepeat(buttonId) {
+        if (directionTimers[buttonId]) {
+            clearTimeout(directionTimers[buttonId]);
+            clearInterval(directionTimers[buttonId]);
+            directionTimers[buttonId] = null;
+        }
+    }
+    
+    // 等待游戏模块加载
+    function waitForGame(callback) {
+        if (typeof _bayeSendKey === 'function') {
+            callback();
+        } else {
+            setTimeout(() => waitForGame(callback), 100);
+        }
+    }
+    
+    waitForGame(function() {
+        // 为每个按钮添加事件
+        Object.keys(keyMap).forEach(buttonId => {
+            const button = document.getElementById(buttonId);
+            const keyValue = keyMap[buttonId];
+            
+            if (button) {
+                // 初始化最后触发时间
+                lastTriggerTime[buttonId] = 0;
+                
+                // 判断是否是方向键
+                const isDirectionKey = directionKeys.includes(buttonId);
+                
+                if (isDirectionKey) {
+                    // 方向键 - 支持连按，使用passive: true保留CSS反馈
+                    button.addEventListener('touchstart', function(e) {
+                        startDirectionRepeat(buttonId, keyValue);
+                    }, { passive: true });
+                    
+                    button.addEventListener('touchend', function(e) {
+                        stopDirectionRepeat(buttonId);
+                    }, { passive: true });
+                    
+                    button.addEventListener('touchcancel', function(e) {
+                        stopDirectionRepeat(buttonId);
+                    }, { passive: true });
+                    
+                    // 鼠标事件
+                    button.addEventListener('mousedown', function(e) {
+                        startDirectionRepeat(buttonId, keyValue);
+                    });
+                    
+                    button.addEventListener('mouseup', function(e) {
+                        stopDirectionRepeat(buttonId);
+                    });
+                    
+                    button.addEventListener('mouseleave', function(e) {
+                        stopDirectionRepeat(buttonId);
+                    });
+                } else {
+                    // 非方向键 - 单次触发，使用passive: true保留CSS反馈
+                    button.addEventListener('touchstart', function(e) {
+                        sendKeyWithCooldown(buttonId, keyValue);
+                    }, { passive: true });
+                    
+                    button.addEventListener('mousedown', function(e) {
+                        sendKeyWithCooldown(buttonId, keyValue);
+                    });
+                }
+            }
+        });
+        
+        console.log('虚拟按键功能已启用，平衡防重复模式');
+    });
+});
+</script>
+
+<!-- 视口管理器 -->
+<script src="js/viewport-manager.js"></script>
+
+<!-- VIP内购 - 农业商业发展倍率 (直接调用C函数) -->
+<script src="js/vip-multiplier.js"></script>
+
+<!-- 全物品功能 -->
+<script src="js/all-items-triple.js"></script>
+
+<!-- 游戏初始化 -->
+<script src="js/game-init.js"></script>
+
+<!-- baye.v2.js 通过 wasm-loader.js 动态加载，以支持 iOS 14 WASM 预加载 -->
